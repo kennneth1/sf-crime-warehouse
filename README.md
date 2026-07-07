@@ -23,8 +23,7 @@ The goal of this project is to transform raw crime records into a clean analytic
 * How do crime patterns differ by police district?
 * What percentage of incidents are resolved?
 
-The final warehouse models crime data at the **incident grain**, where each row represents one unique crime incident.
-
+The final warehouse models crime data at the **incident-offense grain**, where each row represents the latest authoritative state of one offense associated with a police incident.
 ---
 
 # Architecture
@@ -60,59 +59,78 @@ BI / Analytics
 
 ## Fact Table Grain
 
-The primary analytical fact table uses:
+The primary analytical fact table is modeled at the incident-offense grain:
 
-> One row = one unique crime incident
+> One row = one Incident Number + one Incident Code
 
-The source dataset contains multiple report records for some incidents. These represent updates or changes to an incident record rather than separate crimes.
+During data profiling, it was discovered that a single Incident Number may contain multiple offense classifications (Incident Codes). Each offense can also have multiple report records over its lifecycle as officers submit initial reports, supplements, and resolution updates.
 
-Example:
+For example:
 
-```
-Incident Number: 12345
+```text
+Incident Number: 260065646
 
-Report 1:
-  Category = Theft
-  Resolution = NULL
-
-Report 2:
-  Category = Theft
-  Resolution = Arrest
-
-Report 3:
-  Category = Theft
-  Resolution = Closed
+Burglary
+Conspiracy
+Burglary Tools
 ```
 
-The warehouse resolves these multiple records into a single analytical incident.
+These represent separate offenses associated with the same police incident rather than duplicate records.
 
-This prevents downstream users from accidentally counting multiple reports as multiple crimes.
+The warehouse therefore preserves offense-level detail while removing duplicate report updates, allowing downstream users to analyze both offense-level metrics and incident-level metrics without losing information.
 
 ---
 
-# Handling Multiple Reports Per Incident
+# Source Data Grain vs Analytical Grain
 
-The source system contains report-level records, but analytics are primarily performed at the incident level.
+The source crime dataset contains three conceptual levels of information:
 
-The transformation logic:
+1. Police incident (Incident Number)
+2. Offense classifications within that incident (Incident Code)
+3. Multiple report records describing updates to each offense over time
 
-1. Partition records by incident number
-2. Prefer the most complete/current incident representation
-3. Retain the latest known state of the incident
+For example:
 
-Example logic:
-
+```text
+Incident Number
+    |
+    +-- Burglary
+    |     |
+    |     +-- Initial Report
+    |     +-- Supplemental Report
+    |
+    +-- Conspiracy
+    |     |
+    |     +-- Initial Report
+    |     +-- Supplemental Report
+    |
+    +-- Burglary Tools
+          |
+          +-- Initial Report
+          +-- Supplemental Report
 ```
-For each incident:
 
-If resolved:
-    choose the latest resolved record
+Although these records belong to the same police incident, they represent distinct offenses whose report histories evolve independently.
 
-If unresolved:
-    choose the latest available record
-```
+### Choosing the Analytical Grain
 
-This creates a single authoritative incident record.
+Rather than collapsing all offenses into a single incident record, the warehouse preserves the finest meaningful analytical grain:
+
+> One row = one Incident Number + one Incident Code
+
+This allows the warehouse to retain every offense classification while eliminating duplicate report updates generated throughout an investigation.
+
+### Resolving Multiple Reports
+
+Because each offense may have multiple reports over time, the intermediate layer selects a single authoritative record for every Incident Number + Incident Code combination.
+
+The selection logic is:
+
+1. Prefer finalized resolutions (Cite or Arrest Adult, Exceptional Adult, Unfounded).
+2. If multiple finalized reports exist, select the most recent report.
+3. If no finalized report exists, select the latest available report.
+
+This produces one canonical analytical record for each offense while preserving the complete set of offenses associated with every incident.
 
 ---
 
@@ -168,21 +186,19 @@ The staging layer intentionally preserves source information while making it eas
 
 ---
 
-# Intermediate Layer
-
 Purpose:
 
 Apply business logic that should not exist in staging.
 
 Examples:
 
-* Deduplicate incidents
-* Resolve multiple reports per incident
-* Select authoritative incident records
+* Resolve multiple report records for each offense
+* Deduplicate report history
+* Select the latest authoritative state for every Incident Number + Incident Code
 
 This layer answers:
 
-> "What single record represents this crime incident?"
+> "What is the latest analytical representation of this offense?"
 
 ---
 
@@ -190,12 +206,11 @@ This layer answers:
 
 The final models are designed for BI and analysis.
 
-## Fact: Crime Incidents
-
+## Fact: Incident Offenses
 Grain:
 
 ```
-1 row = 1 incident
+1 row = 1 Incident Number + 1 Incident Code
 ```
 
 Contains:
@@ -258,17 +273,16 @@ tests:
 
 # Key Design Decisions
 
-## Why Incident Grain Instead of Report Grain?
+## Why Incident-Offense Grain Instead of Report Grain?
+The source dataset is captured at the report level, where multiple records may describe the same offense as an investigation progresses.
 
-Report grain is more atomic but less useful for general analytics.
+Modeling directly at report grain would require every downstream user to understand police reporting workflows and avoid counting supplemental reports as separate analytical events.
 
-A report-level fact table requires every downstream user to remember:
+Instead, the warehouse resolves report history into one authoritative record per Incident Number + Incident Code.
 
-* Multiple reports may represent one crime
-* Counts must use distinct incident IDs
-* Latest-record logic must be applied
+This preserves every offense while removing operational noise introduced by repeated report updates.
 
-The warehouse instead resolves this complexity upstream.
+Incident-level analysis remains available through aggregation using Incident Number.
 
 ---
 
