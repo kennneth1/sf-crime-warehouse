@@ -87,7 +87,6 @@ select
     incidentDatetime,
     reportDatetime,
     incidentCategory,
-    "Incident Day of Week" as incidentDayOfWeek,
     "Analysis Neighborhood" as neighborhood,
     "Police District" as district,
     Latitude as latitude,
