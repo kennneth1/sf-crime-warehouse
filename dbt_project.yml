@@ -17,6 +17,8 @@ models:
   sf-crime-warehouse:
     staging:
       +materialized: view
+    intermediate:
+      +materialized: view
     marts:
       dimensions:
         +materialized: table

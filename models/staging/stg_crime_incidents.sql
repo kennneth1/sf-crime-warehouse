@@ -1,5 +1,3 @@
-{{ config(materialized='view') }}
-
 with raw as (
     select *
     from {{ ref('landing') }}
@@ -43,7 +41,7 @@ category_map as (
             when incidentCategoryNorm = 'weapons carrying etc' then 'Weapons Carrying'
             when incidentCategoryNorm = 'offences against the family and children' then 'Offences Against the Family and Children'
             when incidentCategoryNorm in ('motor vehicle theft?', 'motor vehicle theif') then 'Motor Vehicle Theft'
-            when incidentCategoryNorm = 'suspicious occ' then 'Suspicious'
+            when incidentCategoryNorm in ('suspicious occ', 'suspicious') then 'Suspicious'
             when incidentCategoryNorm like 'human trafficking%' then 'Human Trafficking'
             when incidentCategoryNorm = 'homicide' then 'Homicide'
             when incidentCategoryNorm = 'rape' then 'Rape'
@@ -60,26 +58,12 @@ category_map as (
             when incidentCategoryNorm = 'fraud' then 'Fraud'
             when incidentCategoryNorm = 'embezzlement' then 'Embezzlement'
             when incidentCategoryNorm = 'forgery and counterfeiting' then 'Forgery and Counterfeiting'
-            when incidentCategoryNorm = 'drug offense' then 'Drug Offense'
+            when incidentCategoryNorm in ('drug offense', 'drug violation') then 'Drug Offense'
             when incidentCategoryNorm = 'sex offense' then 'Sex Offense'
 
             else incidentCategoryRaw
         end as incidentCategory
     from clean_category
-),
-
--- Filter canonical categories
-canonical as (
-    select *
-    from category_map
-    where incidentCategory in (
-        'Homicide','Rape','Robbery','Human Trafficking','Assault',
-        'Prostitution','Offences Against the Family and Children',
-        'Arson','Burglary','Motor Vehicle Theft','Larceny Theft',
-        'Stolen Property','Malicious Mischief','Vandalism',
-        'Fraud','Embezzlement','Forgery and Counterfeiting',
-        'Drug Offense','Weapons Carrying','Weapons Offense', 'Sex Offense'
-    )
 )
       
 select
@@ -94,4 +78,4 @@ select
     Resolution as resolution,
     "Intersection" as intersection
 
-from canonical
+from category_map
