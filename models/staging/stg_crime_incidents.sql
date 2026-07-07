@@ -68,6 +68,7 @@ category_map as (
       
 select
     "Incident Number" as incidentNumber,
+    "Incident Code" as incidentCode,
     incidentDatetime,
     reportDatetime,
     incidentCategory,
