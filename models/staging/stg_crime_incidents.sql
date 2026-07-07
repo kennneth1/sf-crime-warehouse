@@ -35,10 +35,10 @@ clean_category as (
     from clean_datetime
 ),
 
+-- map lowercase variants to canonical nice-case names
 category_map as (
     select *,
         case
-            -- map lowercase variants to canonical nice-case names
             when incidentCategoryNorm = 'weapons offence' then 'Weapons Offense'
             when incidentCategoryNorm = 'weapons carrying etc' then 'Weapons Carrying'
             when incidentCategoryNorm = 'offences against the family and children' then 'Offences Against the Family and Children'
@@ -82,19 +82,6 @@ canonical as (
     )
 ),
       
-
-
--- TODO: Move to dim_date and dim_time
-final as (
-    select *,
-        extract(year from incidentDatetime) as year,
-        strftime(incidentDatetime, '%b') as month,
-        extract(day from incidentDatetime) as day,
-        extract(hour from incidentDatetime) as hour,
-        case when extract(hour from incidentDatetime) between 6 and 17 then 'day' else 'night' end as nightOrDay
-    from broad_categories
-)
-
 select
     "Incident Number" as incidentNumber,
     incidentDatetime,
@@ -108,4 +95,4 @@ select
     Resolution as resolution,
     "Intersection" as intersection
 
-from final
+from canonical
