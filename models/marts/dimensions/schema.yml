@@ -1,0 +1,17 @@
+models:
+  - name: dim_date
+    columns:
+      - name: date_id
+        tests: [unique, not_null]
+  - name: dim_category
+    columns:
+      - name: category_id
+        tests: [unique, not_null]
+  - name: dim_geo
+    columns:
+      - name: geo_id
+        tests: [unique, not_null]
+  - name: dim_time
+    columns:
+      - name: time_id
+        tests: [unique, not_null]
