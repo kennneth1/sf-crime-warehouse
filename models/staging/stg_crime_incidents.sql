@@ -83,22 +83,6 @@ canonical as (
 ),
       
 
----  TODO: move to dim_categories
-broad_categories as (
-    select *,
-        case 
-            when incidentCategory in (
-                'Homicide','Robbery','Assault','Prostitution','Offences Against the Family and Children',
-                'Weapons Carrying','Weapons Offense'
-            ) or incidentCategory like 'Human Trafficking%' then 'Violent'
-            when incidentCategory in ('Arson','Burglary','Motor Vehicle Theft','Larceny Theft','Stolen Property','Malicious Mischief','Vandalism') then 'Property'
-            when incidentCategory in ('Rape','Sex Offense') then 'Sexual'
-            when incidentCategory in ('Fraud','Embezzlement','Forgery and Counterfeiting') then 'Fiscal/Fraud'
-            when incidentCategory = 'Drug Offense' then 'Drug'
-            else 'Other'
-        end as incidentCategoryBroad
-    from severity_ranked
-),
 
 -- TODO: Move to dim_date and dim_time
 final as (
