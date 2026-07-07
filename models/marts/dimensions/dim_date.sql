@@ -20,7 +20,18 @@ final as (
             when extract(dow from date_day) in (0, 6) then true
             else false
         end as is_weekend,
-        'Q' || extract(quarter from date_day) as quarter
+        'Q' || extract(quarter from date_day) as quarter,
+        date_trunc(
+            'day',
+            date_day + (6 - extract(dow from date_day)) * interval '1 day'
+        ) as week_ending,
+        'Week ending ' || strftime(
+            date_trunc(
+                'day',
+                date_day + (6 - extract(dow from date_day)) * interval '1 day'
+            ),
+            '%Y-%m-%d'
+        ) as week_ending_label
     from date_spine
 )
 
