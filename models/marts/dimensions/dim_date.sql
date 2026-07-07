@@ -25,7 +25,7 @@ final as (
 )
 
 select
-    {{ dbt_utils.generate_surrogate_key(['calendar_date']) }} as date_id,
+    cast(strftime(calendar_date, '%Y%m%d') as int) as date_id,
     calendar_date,
     year,
     month,

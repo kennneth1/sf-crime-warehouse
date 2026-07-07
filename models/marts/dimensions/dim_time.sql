@@ -20,7 +20,7 @@ final as (
 )
 
 select
-    {{ dbt_utils.generate_surrogate_key(['hour']) }} as time_id,
+    hour as time_id,
     hour,
     time_of_day_bucket
 from final
