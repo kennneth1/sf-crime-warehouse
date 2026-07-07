@@ -2,7 +2,7 @@
 
 with raw as (
     select *
-    from {{ ref('sf_crime_raw') }}
+    from {{ ref('landing') }}
 ),
 
 -- Drop nulls in required columns and rows outside SF
@@ -80,7 +80,7 @@ canonical as (
         'Fraud','Embezzlement','Forgery and Counterfeiting',
         'Drug Offense','Weapons Carrying','Weapons Offense', 'Sex Offense'
     )
-),
+)
       
 select
     "Incident Number" as incidentNumber,
