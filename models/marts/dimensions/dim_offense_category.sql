@@ -1,7 +1,7 @@
 {{ config(materialized='table') }}
 
 with raw as (
-    select distinct incidentCategory, incidentSubcategory, incidentDescription
+    select distinct incidentCode, incidentCategory, incidentSubcategory, incidentDescription
     from {{ ref('int_latest_crime_incidents') }}
 ),
 categorized as (
