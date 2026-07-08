@@ -213,7 +213,7 @@ join dim_date rd on f.report_date_id = rd.date_id
 join dim_offense c on f.offense_id = c.offense_id
 join dim_geo g on f.geo_id = g.geo_id
 
-where id.year>=2026 and g.district = 'Tenderloin' and c.offenseCategoryBroad != 'Other'
+where id.year>=2026 and g.district = 'Tenderloin' and c.offenseBroad != 'Other'
 order by f.incidentNumber, f.incidentCode, rd.calendar_date
 ```
 
