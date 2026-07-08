@@ -36,7 +36,7 @@ SELECT
     neighborhood,
     district,
     latitude,
-    longitude
+    longitude,
     resolution,
     intersection
 
