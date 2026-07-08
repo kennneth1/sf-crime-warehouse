@@ -74,6 +74,8 @@ select
     incidentDatetime,
     reportDatetime,
     incidentCategory,
+    "Incident Subcategory" as incidentSubcategory,
+    "Incident Description" as incidentDescription,
     "Analysis Neighborhood" as neighborhood,
     "Police District" as district,
     Latitude as latitude,
