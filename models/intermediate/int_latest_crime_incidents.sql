@@ -11,7 +11,7 @@ with raw as (
 ranked as (
     select *,
     row_number() over (
-        partition by incidentNumber, incidentCode
+        partition by incident_number, incident_code
         order by
             case
                 when resolution in (
@@ -22,21 +22,21 @@ ranked as (
                 then 1
                 else 0
             end desc,
-            reportDatetime desc,
-            incidentId desc
+            report_datetime desc,
+            incident_id desc
 
     ) as rn
     from raw
 )
 
 SELECT
-    incidentNumber,
-    incidentCode,
-    incidentDatetime,
-    reportDatetime,
-    incidentCategory,
-    incidentSubcategory,
-    incidentDescription,
+    incident_number,
+    incident_code,
+    incident_datetime,
+    report_datetime,
+    incident_category,
+    incident_subcategory,
+    incident_description,
     neighborhood,
     district,
     latitude,
