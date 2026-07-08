@@ -17,6 +17,12 @@ Transforms raw SFPD incident records into a clean warehouse that answers:
 
 **Fact grain:** one row = one offense (`Incident Number + Incident Code`), reflecting its latest authoritative state.
 
+Incident Number = the overall case.
+Incident ID = a write-up/report filed for that case, containing a batch of offense codes.
+Incident Code = one offense within that batch.
+
+**dbt implementation:** staging's native grain is `incident_id + incident_code` (one row per offense-per-report, per SFPD docs); intermediate collapses that to `incident_number + incident_code` via `ROW_NUMBER()` (resolution priority → latest report_datetime → `incident_id` as final tiebreak); marts/fact select only `incident_number + incident_code` — `incident_id` did its job upstream and never surfaces downstream.
+
 ---
 
 ## Architecture

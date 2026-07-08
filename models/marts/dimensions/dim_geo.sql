@@ -5,7 +5,7 @@ with distinct_geo as (
         intersection,
         neighborhood,
         district
-    from {{ ref('stg_crime_incidents') }}
+    from {{ ref('int_latest_crime_incidents') }}
 )
 
 --- fct_crime_incidents must join on intersection, neighborhood, district to obtain the proper FK without fan-out

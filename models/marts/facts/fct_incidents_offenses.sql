@@ -5,16 +5,15 @@
 ) }}
 */
 
---- 1 grain = 1 incident happening at a latlong (descriptive attr) ->intersection (most granular geo dim) -> neighborhood / district
 select 
 stg.incidentNumber,
 stg.incidentCode,
 stg.latitude,
 stg.longitude,
-c.category_id
+c.offense_category_id
 
-from {{ ref('stg_crime_incidents') }} stg left join {{ ref('dim_category') }} c --- testing for null dimensions for now
-on stg.incidentCategory = c.incidentCategory 
+from {{ ref('int_latest_crime_incidents') }} stg left join {{ ref('dim_category') }} c --- testing for null dimensions for now
+on stg.incidentCategory = c.offenseCategory 
 
 /* left join {{ ref('dim_date') }} d 
 left join {{ ref('dim_date') }} dd_incident on dd_incident.date_id = cast(strftime(date_trunc('day', stg.incidentDatetime), '%Y%m%d') as int)

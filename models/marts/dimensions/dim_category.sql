@@ -2,7 +2,7 @@
 
 with raw as (
     select distinct incidentCategory
-    from {{ ref('stg_crime_incidents') }}
+    from {{ ref('int_latest_crime_incidents') }}
 ),
 categorized as (
     select *,
