@@ -7,7 +7,7 @@ with raw as (
 )
 
 select
-    row_number() over (order by resolution) as resolution_id,
-    resolution
-
+row_number() over (order by resolution) as resolution_id,
+resolution
+from raw
 
