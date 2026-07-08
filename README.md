@@ -135,7 +135,7 @@ models/
 | `dim_category` | Standardized category, broad grouping (Violent/Property/etc.), severity rank |
 | `dim_resolution` | Final disposition/outcome of the incident (e.g., arrest made, citation issued, no action, unresolved) |
 
-Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT offense_count)` against the fact table.
+Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT incident_number)` against the fact table.
 
 
 
