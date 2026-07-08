@@ -1,7 +1,7 @@
 select 
 stg.incidentNumber,
 stg.incidentCode,
-stg.resolution,
+r.resolution_id,
 c.offense_category_id,
 dd_incident.date_id as incident_date_id,
 dt_incident.time_id as incident_time_id,
@@ -21,3 +21,4 @@ left join {{ ref('dim_geo')}} g
     and stg.intersection = g.intersection
     and stg.district = g.district
     and stg.neighborhood = g.neighborhood
+left join {{ ref('dim_resolution') }} r on stg.resolution = r.resolution
