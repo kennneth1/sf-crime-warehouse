@@ -3,7 +3,7 @@ models:
     columns:
       - name: date_id
         tests: [unique, not_null]
-  - name: dim_category
+  - name: dim_offense_category
     columns:
       - name: offense_category_id
         tests: [unique, not_null]
