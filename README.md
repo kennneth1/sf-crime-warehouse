@@ -105,6 +105,8 @@ models/
         ├── dim_date.sql
         ├── dim_geo.sql
         └── dim_offense_category.sql
+        └── dim_time.sql
+        └── dim_resolution.sql
 ```
 
 **Staging** preserves source fidelity (clean types, standardize category strings, filter invalid/placeholder incident numbers like `000000000`). **Intermediate** applies the dedup business rule above. **Marts** expose analyst-friendly naming — e.g. `offenseCategory` instead of the source's `Incident Category`, since the fact table's grain is the offense, not the whole case.

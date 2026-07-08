@@ -43,7 +43,6 @@ categorized as (
     from raw
 )
 
-
 select   
 {{ dbt_utils.generate_surrogate_key(['incidentCategory']) }} as offense_category_id,
 incidentCategory as offenseCategory,
