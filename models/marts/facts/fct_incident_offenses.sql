@@ -1,8 +1,6 @@
 select 
 stg.incidentNumber,
 stg.incidentCode,
-stg.latitude,
-stg.longitude,
 stg.resolution,
 c.offense_category_id,
 dd_incident.date_id as incident_date_id,
