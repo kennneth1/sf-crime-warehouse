@@ -273,6 +273,10 @@ Supports:
 
 Provides standardized crime classifications.
 
+The source dataset refers to this attribute as `Incident Category`. However, because the warehouse fact table is modeled at the offense grain (`incident_number + incident_code`), this attribute represents the classification of an individual offense rather than the entire police incident.
+
+Therefore, the analytical layer exposes this field as `offenseCategory` to better reflect its meaning.
+
 ---
 
 # Data Quality Considerations
