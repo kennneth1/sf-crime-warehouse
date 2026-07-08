@@ -191,8 +191,7 @@ Purpose:
 
 Apply business logic that should not exist in staging.
 
-Examples:
-
+Example:
 * Resolve multiple report records for each offense
 * Deduplicate report history
 * Select the latest authoritative state for every Incident Number + Incident Code
