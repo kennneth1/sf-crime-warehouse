@@ -48,7 +48,7 @@ select
 incidentCategory as offenseCategory,
 incidentCategoryBroad as offenseCategoryBroad,
 incidentSubcategory as offenseSubCategory,
-incidentDescription as offenseDescription
+incidentDescription as offenseDescription,
 severityRank 
 from categorized
 
