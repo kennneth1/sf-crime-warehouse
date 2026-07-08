@@ -35,6 +35,8 @@ SELECT
     incidentDatetime,
     reportDatetime,
     incidentCategory,
+    incidentSubcategory,
+    incidentDescription,
     neighborhood,
     district,
     latitude,
