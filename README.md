@@ -117,7 +117,7 @@ models/
 |---|---|
 | `incidentNumber` | Police case / incident identifier (degenerate dimension) |
 | `incidentCode` | Specific offense identifier within an incident (degenerate dimension) |
-| `resolution` | Final disposition/outcome of the incident (descriptive attribute e.g., arrest made, citation issued, no action, unresolved) |
+| `resolution_id` | FK to dim_resolution |
 | `offense_category_id` | FK to dim_category |
 | `incident_date_id` | FK to dim_date |
 | `incident_time_id` | FK to dim_time |
@@ -133,8 +133,9 @@ models/
 | `dim_time` | Hours, time-of-day |
 | `dim_geo` | Neighborhood, district, intersection, latitude, longitude |
 | `dim_category` | Standardized category, broad grouping (Violent/Property/etc.), severity rank |
+| `dim_resolution` | Final disposition/outcome of the incident (e.g., arrest made, citation issued, no action, unresolved) |
 
-Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT incident_number)` against the fact table.
+Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT offense_count)` against the fact table.
 
 
 
@@ -154,6 +155,12 @@ Incident-level metrics (e.g. "how many police cases occurred?") remain available
     - dbt_utils.unique_combination_of_columns:
         arguments:
           combination_of_columns: [incidentNumber, incidentCode]
+
+- name: fct_incident_offenses
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [incidentNumber, incidentCode]
 ```
 
 Plus standard `not_null`/`unique` checks on dimension surrogate keys and `accepted_values` on `resolution`.
