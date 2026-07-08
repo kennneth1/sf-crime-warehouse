@@ -9,3 +9,5 @@ models:
                 - "Open or Active"
                 - "Cite or Arrest Adult"
                 - "Exceptional Adult"
+                - "Unfounded"
+
