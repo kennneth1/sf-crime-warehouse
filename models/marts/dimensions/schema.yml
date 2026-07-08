@@ -5,7 +5,7 @@ models:
         tests: [unique, not_null]
   - name: dim_category
     columns:
-      - name: category_id
+      - name: offense_category_id
         tests: [unique, not_null]
   - name: dim_geo
     columns:
