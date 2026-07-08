@@ -1,0 +1,12 @@
+models:
+  - name: int_latest_crime_incidents
+    columns:
+      - name: resolution
+        tests:
+          - not_null
+          - accepted_values:
+              values:
+                - "Open or Active"
+                - "Cite or Arrest Adult"
+                - "Exceptional Adult"
+                - "Unfounded"
