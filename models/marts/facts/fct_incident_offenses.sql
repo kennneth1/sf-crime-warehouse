@@ -7,7 +7,8 @@ dd_incident.date_id as incident_date_id,
 dt_incident.time_id as incident_time_id,
 dd_report.date_id as report_date_id,
 dt_report.time_id as report_time_id,
-g.geo_id
+g.geo_id,
+1 as offense_count
 
 from {{ ref('int_latest_crime_incidents') }} stg left join {{ ref('dim_offense_category') }} c --- testing for null dimensions for now
 on stg.incidentCategory = c.offenseCategory 
