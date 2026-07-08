@@ -191,6 +191,7 @@ dbt build --select marts.dimensions
 Test:
 dbt test --select stg_crime_incidents
 
+Use duckdb_jdbc-1.3.0.0.jar to connect in tablaeu
 ```
 
 Example fact-dim join usage:
