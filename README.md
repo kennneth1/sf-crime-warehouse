@@ -115,6 +115,14 @@ models/
 
 **`fct_incident_offenses`** — grain: 1 row = 1 Incident Number + 1 Incident Code. Contains offense/geo/category keys, resolution, lat/long as descriptive attributes (low-cardinality, no reuse case — kept in-fact rather than dimensionalized).
 
+                    dim_date
+                       |
+                       |
+dim_geo ---- fct_incident_offenses ---- dim_offense_category
+                       |
+                       |
+                   dim_time
+
 | Dimension | Supports |
 |---|---|
 | `dim_date` | Trends, seasonality, day-of-week |
