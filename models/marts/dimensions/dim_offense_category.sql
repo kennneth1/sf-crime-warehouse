@@ -45,6 +45,7 @@ categorized as (
 
 select   
 {{ dbt_utils.generate_surrogate_key(['incidentCode']) }} as offense_category_id,
+incidentCode,
 incidentCategory as offenseCategory,
 incidentCategoryBroad as offenseCategoryBroad,
 incidentSubcategory as offenseSubCategory,
