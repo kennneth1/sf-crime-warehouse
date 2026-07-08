@@ -25,5 +25,5 @@ join {{ ref('dim_offense') }} c on f.offense_id = c.offense_id
 join {{ ref('dim_geo') }} g on f.geo_id = g.geo_id
 join {{ ref('dim_resolution') }} r on f.resolution_id = r.resolution_id
 
-where id.year>=2022 and c.offense_broad != 'Other'
+where id.year>=2022 and c.offense_category_broad != 'Other'
 order by f.incident_number, f.incident_code, rd.calendar_date
