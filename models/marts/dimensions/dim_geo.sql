@@ -13,7 +13,8 @@ with distinct_geo as (
 select
     {{ dbt_utils.generate_surrogate_key([
         'latitude',
-        'longitude'
+        'longitude',
+        'intersection'
     ]) }} as geo_id,
     intersection,
     neighborhood,
