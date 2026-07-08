@@ -1,6 +1,6 @@
 select 
-stg.incidentNumber,
-stg.incidentCode,
+stg.incident_number,
+stg.incident_code,
 r.resolution_id,
 c.offense_id,
 dd_incident.date_id as incident_date_id,
@@ -11,11 +11,11 @@ g.geo_id,
 1 as offense_count
 
 from {{ ref('int_latest_crime_incidents') }} stg left join {{ ref('dim_offense') }} c --- testing for null dimensions for now
-on stg.incidentCode = c.incidentCode 
-left join {{ ref('dim_date') }} dd_incident on dd_incident.date_id = cast(strftime(date_trunc('day', stg.incidentDatetime), '%Y%m%d') as int)
-left join {{ ref('dim_time') }} dt_incident on dt_incident.time_id = cast(extract(hour from stg.incidentDatetime) as int)
-left join {{ ref('dim_date') }} dd_report on dd_report.date_id = cast(strftime(date_trunc('day', stg.reportDatetime), '%Y%m%d') as int)
-left join {{ ref('dim_time') }} dt_report on dt_report.time_id = cast(extract(hour from stg.reportDatetime) as int)
+on stg.incident_code = c.incident_code 
+left join {{ ref('dim_date') }} dd_incident on dd_incident.date_id = cast(strftime(date_trunc('day', stg.incident_datetime), '%Y%m%d') as int)
+left join {{ ref('dim_time') }} dt_incident on dt_incident.time_id = cast(extract(hour from stg.incident_datetime) as int)
+left join {{ ref('dim_date') }} dd_report on dd_report.date_id = cast(strftime(date_trunc('day', stg.report_datetime), '%Y%m%d') as int)
+left join {{ ref('dim_time') }} dt_report on dt_report.time_id = cast(extract(hour from stg.report_datetime) as int)
 left join {{ ref('dim_geo')}} g
     on stg.latitude = g.latitude and stg.longitude = g.longitude
     and stg.intersection = g.intersection

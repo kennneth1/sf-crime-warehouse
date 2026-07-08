@@ -3,10 +3,10 @@ version: 2
 models:
   - name: fct_incident_offenses
     columns:
-      - name: incidentNumber
+      - name: incident_number
         tests:
           - not_null
-      - name: incidentCode
+      - name: incident_code
         tests:
           - not_null
       - name: offense_id
@@ -31,4 +31,4 @@ models:
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
-            combination_of_columns: [incidentNumber, incidentCode]
+            combination_of_columns: [incident_number, incident_code]
