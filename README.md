@@ -117,6 +117,8 @@ models/
 
 ## Fact & Dimensions
 
+**`fct_incident_offenses`** — grain: 1 row = 1 Incident Number + 1 Incident Code. Contains offense/geo/category keys, resolution, lat/long as descriptive attributes (low-cardinality, no reuse case — kept in-fact rather than dimensionalized).
+
 | Col | Info |
 |---|---|
 | `incidentNumber` | Police case / incident identifier (degenerate dimension) |
@@ -130,7 +132,7 @@ models/
 | `geo_id` | FK to dim_geo |
 | `offense_count` | measure |
 
-**`fct_incident_offenses`** — grain: 1 row = 1 Incident Number + 1 Incident Code. Contains offense/geo/category keys, resolution, lat/long as descriptive attributes (low-cardinality, no reuse case — kept in-fact rather than dimensionalized).
+As of run on Jul 8 2026 (using 3+ month old CSV), fact has 883,613 rows spanning incident dates 2018-01-01 to 2026-2-04.
 
 | Dimension | Supports |
 |---|---|
