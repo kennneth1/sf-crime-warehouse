@@ -119,6 +119,7 @@ models/
 | `incidentCode` | Specific offense identifier within an incident (degenerate dimension) |
 | `latitude` | latitude (descriptive attribute) |
 | `longitude` | longitude (descriptive attribute) |
+| `resolution` | Final disposition/outcome of the incident (descriptive attribute e.g., arrest made, citation issued, no action, unresolved) |
 | `offense_category_id` | FK to dim_category |
 | `incident_date_id` | FK to dim_date |
 | `incident_time_id` | FK to dim_time |
