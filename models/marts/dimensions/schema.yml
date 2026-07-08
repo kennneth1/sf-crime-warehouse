@@ -15,3 +15,7 @@ models:
     columns:
       - name: time_id
         tests: [unique, not_null]
+  - name: dim_resolution
+    columns:
+      - name: resolution_id
+        tests: [unique, not_null]
