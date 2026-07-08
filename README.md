@@ -8,7 +8,7 @@ Demonstrates: source profiling, dimensional modeling, grain resolution, and dbt-
 
 ## Project Overview
 
-Transforms raw SFPD incident records into a clean warehouse that answers:
+Transforms raw SFPD incident records (https://data.sfgov.org/Public-Safety/Police-Department-Incident-Reports-2018-to-Present/wg3w-h783) into a clean warehouse that answers:
 
 - How has crime changed over time?
 - Which neighborhoods/districts see the most incidents?
