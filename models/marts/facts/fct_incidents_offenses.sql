@@ -8,6 +8,7 @@
 --- 1 grain = 1 incident happening at a latlong (descriptive attr) ->intersection (most granular geo dim) -> neighborhood / district
 select 
 stg.incidentNumber,
+stg.incidentCode,
 stg.latitude,
 stg.longitude,
 c.category_id

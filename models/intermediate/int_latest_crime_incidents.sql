@@ -22,7 +22,9 @@ ranked as (
                 then 1
                 else 0
             end desc,
-            reportDatetime desc
+            reportDatetime desc,
+            incidentId desc
+
     ) as rn
     from raw
 )
