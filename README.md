@@ -113,6 +113,19 @@ models/
 
 ## Fact & Dimensions
 
+| Col | Info |
+|---|---|
+| `incidentNumber` | Overall Incident Case, degenerate |
+| `incidentCode` | Hours, time-of-day |
+| `latitude` | latitude |
+| `longitude` | longitude |
+| `offense_category_id` | FK to dim_category |
+| `incident_date_id` | FK to dim_date |
+| `incident_time_id` | FK to dim_time |
+| `report_date_id` | FK to dim_date |
+| `report_time_id` | FK to dim_time |
+| `geo_id` | FK to dim_geo |
+
 **`fct_incident_offenses`** — grain: 1 row = 1 Incident Number + 1 Incident Code. Contains offense/geo/category keys, resolution, lat/long as descriptive attributes (low-cardinality, no reuse case — kept in-fact rather than dimensionalized).
 
 | Dimension | Supports |
@@ -123,6 +136,8 @@ models/
 | `dim_category` | Standardized category, broad grouping (Violent/Property/etc.), severity rank |
 
 Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT incident_number)` against the fact table.
+
+
 
 ---
 
