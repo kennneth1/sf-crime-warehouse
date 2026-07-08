@@ -44,5 +44,6 @@ select
     week,
     day_of_week,
     is_weekend,
-    quarter
+    quarter,
+    week_ending_label
 from final
