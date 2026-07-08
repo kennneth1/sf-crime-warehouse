@@ -134,7 +134,7 @@ models/
 | `dim_date` | Trends, seasonality, day-of-week |
 | `dim_time` | Hours, time-of-day |
 | `dim_geo` | Neighborhood, district, intersection, latitude, longitude |
-| `dim_category` | Standardized category, broad grouping (Violent/Property/etc.), severity rank |
+| `dim_category` | Standardized category, broad grouping (Violent/Property/etc.), severity rank, subcategory, description |
 | `dim_resolution` | Final disposition/outcome of the incident (e.g., arrest made, citation issued, no action, unresolved) |
 
 Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT incident_number)` against the fact table.
