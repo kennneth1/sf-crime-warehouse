@@ -227,10 +227,8 @@ order by f.incidentNumber, f.incidentCode, rd.calendar_date
 
 ## Future Improvements
 
-- Incremental models for new incident ingestion
 - Airflow orchestration
 - Cloud warehouse deployment
-- BI dashboard layer
 - Snapshots to track offense resolution history over time
 
 ---

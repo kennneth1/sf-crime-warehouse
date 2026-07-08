@@ -20,8 +20,8 @@ clean_required as (
 clean_datetime as (
     select
         *,
-        strptime("Incident Datetime", '%Y/%m/%d %I:%M:%S %p') as incidentDatetime,
-        strptime("Report Datetime", '%Y/%m/%d %I:%M:%S %p') as reportDatetime
+        strptime("Incident Datetime", '%Y/%m/%d %I:%M:%S %p') as incident_datetime,
+        strptime("Report Datetime", '%Y/%m/%d %I:%M:%S %p') as report_datetime
     from clean_required
 ),
 
@@ -29,8 +29,8 @@ clean_datetime as (
 clean_category as (
     select
         *,
-        trim("Incident Category") as incidentCategoryRaw,  -- keep original for fallback
-        lower(trim("Incident Category")) as incidentCategoryNorm  -- lowercase for matching
+        trim("Incident Category") as incident_category_raw,  -- keep original for fallback
+        lower(trim("Incident Category")) as incident_category_norm  -- lowercase for matching
     from clean_datetime
 ),
 
@@ -38,44 +38,44 @@ clean_category as (
 category_map as (
     select *,
         case
-            when incidentCategoryNorm = 'weapons offence' then 'Weapons Offense'
-            when incidentCategoryNorm = 'weapons carrying etc' then 'Weapons Carrying'
-            when incidentCategoryNorm = 'offences against the family and children' then 'Offences Against the Family and Children'
-            when incidentCategoryNorm in ('motor vehicle theft?', 'motor vehicle theif') then 'Motor Vehicle Theft'
-            when incidentCategoryNorm in ('suspicious occ', 'suspicious') then 'Suspicious'
-            when incidentCategoryNorm like 'human trafficking%' then 'Human Trafficking'
-            when incidentCategoryNorm = 'homicide' then 'Homicide'
-            when incidentCategoryNorm = 'rape' then 'Rape'
-            when incidentCategoryNorm = 'robbery' then 'Robbery'
-            when incidentCategoryNorm = 'assault' then 'Assault'
-            when incidentCategoryNorm = 'prostitution' then 'Prostitution'
-            when incidentCategoryNorm = 'arson' then 'Arson'
-            when incidentCategoryNorm = 'burglary' then 'Burglary'
-            when incidentCategoryNorm = 'motor vehicle theft' then 'Motor Vehicle Theft'
-            when incidentCategoryNorm = 'larceny theft' then 'Larceny Theft'
-            when incidentCategoryNorm = 'stolen property' then 'Stolen Property'
-            when incidentCategoryNorm = 'malicious mischief' then 'Malicious Mischief'
-            when incidentCategoryNorm = 'vandalism' then 'Vandalism'
-            when incidentCategoryNorm = 'fraud' then 'Fraud'
-            when incidentCategoryNorm = 'embezzlement' then 'Embezzlement'
-            when incidentCategoryNorm = 'forgery and counterfeiting' then 'Forgery and Counterfeiting'
-            when incidentCategoryNorm in ('drug offense', 'drug violation') then 'Drug Offense'
-            when incidentCategoryNorm = 'sex offense' then 'Sex Offense'
+            when incident_category_norm = 'weapons offence' then 'Weapons Offense'
+            when incident_category_norm = 'weapons carrying etc' then 'Weapons Carrying'
+            when incident_category_norm = 'offences against the family and children' then 'Offences Against the Family and Children'
+            when incident_category_norm in ('motor vehicle theft?', 'motor vehicle theif') then 'Motor Vehicle Theft'
+            when incident_category_norm in ('suspicious occ', 'suspicious') then 'Suspicious'
+            when incident_category_norm like 'human trafficking%' then 'Human Trafficking'
+            when incident_category_norm = 'homicide' then 'Homicide'
+            when incident_category_norm = 'rape' then 'Rape'
+            when incident_category_norm = 'robbery' then 'Robbery'
+            when incident_category_norm = 'assault' then 'Assault'
+            when incident_category_norm = 'prostitution' then 'Prostitution'
+            when incident_category_norm = 'arson' then 'Arson'
+            when incident_category_norm = 'burglary' then 'Burglary'
+            when incident_category_norm = 'motor vehicle theft' then 'Motor Vehicle Theft'
+            when incident_category_norm = 'larceny theft' then 'Larceny Theft'
+            when incident_category_norm = 'stolen property' then 'Stolen Property'
+            when incident_category_norm = 'malicious mischief' then 'Malicious Mischief'
+            when incident_category_norm = 'vandalism' then 'Vandalism'
+            when incident_category_norm = 'fraud' then 'Fraud'
+            when incident_category_norm = 'embezzlement' then 'Embezzlement'
+            when incident_category_norm = 'forgery and counterfeiting' then 'Forgery and Counterfeiting'
+            when incident_category_norm in ('drug offense', 'drug violation') then 'Drug Offense'
+            when incident_category_norm = 'sex offense' then 'Sex Offense'
 
-            else incidentCategoryRaw
-        end as incidentCategory
+            else incident_category_raw
+        end as incident_category
     from clean_category
 )
       
 select
-    "Incident ID" as incidentId,
-    "Incident Number" as incidentNumber,
-    "Incident Code" as incidentCode,
-    incidentDatetime,
-    reportDatetime,
-    incidentCategory,
-    "Incident Subcategory" as incidentSubcategory,
-    "Incident Description" as incidentDescription,
+    "Incident ID" as incident_id,
+    "Incident Number" as incident_number,
+    "Incident Code" as incident_code,
+    incident_datetime,
+    report_datetime,
+    incident_category,
+    "Incident Subcategory" as incident_subcategory,
+    "Incident Description" as incident_description,
     "Analysis Neighborhood" as neighborhood,
     "Police District" as district,
     Latitude as latitude,
