@@ -120,7 +120,7 @@ models/
 | `incidentNumber` | Police case / incident identifier (degenerate dimension) |
 | `incidentCode` | Specific offense identifier within an incident (degenerate dimension) |
 | `resolution_id` | FK to dim_resolution |
-| `offense_category_id` | FK to dim_category |
+| `offense_id` | FK to dim_category |
 | `incident_date_id` | FK to dim_date |
 | `incident_time_id` | FK to dim_time |
 | `report_date_id` | FK to dim_date |
@@ -134,7 +134,7 @@ models/
 | `dim_date` | Trends, seasonality, day-of-week |
 | `dim_time` | Hours, time-of-day |
 | `dim_geo` | Neighborhood, district, intersection, latitude, longitude |
-| `dim_category` | Standardized category, broad grouping (Violent/Property/etc.), severity rank, subcategory, description |
+| `dim_offense` | Standardized category, broad grouping (Violent/Property/etc.), severity rank, subcategory, description |
 | `dim_resolution` | Final disposition/outcome of the incident (e.g., arrest made, citation issued, no action, unresolved) |
 
 Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT incident_number)` against the fact table.
@@ -199,7 +199,7 @@ f.offense_count,
 id.calendar_date as incidentDate,
 rd.calendar_date as reportDate,
 c.severityRank,
-c.offenseCategoryBroad,
+c.offenseBroad,
 g.district,
 g.intersection,
 g.neighborhood,
@@ -210,7 +210,7 @@ g.longitude
 from fct_incident_offenses f
 join dim_date id on f.incident_date_id = id.date_id
 join dim_date rd on f.report_date_id = rd.date_id
-join dim_offense_category c on f.offense_category_id = c.offense_category_id
+join dim_offense c on f.offense_id = c.offense_id
 join dim_geo g on f.geo_id = g.geo_id
 
 where id.year>=2026 and g.district = 'Tenderloin' and c.offenseCategoryBroad != 'Other'
