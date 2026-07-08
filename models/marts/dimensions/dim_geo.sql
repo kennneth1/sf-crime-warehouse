@@ -14,7 +14,9 @@ select
     {{ dbt_utils.generate_surrogate_key([
         'latitude',
         'longitude',
-        'intersection'
+        'intersection',
+        'neighborhood',
+        'district'
     ]) }} as geo_id,
     intersection,
     neighborhood,
