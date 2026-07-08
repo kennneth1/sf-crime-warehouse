@@ -24,3 +24,5 @@ models:
         +materialized: table
       facts:
         +materialized: table
+      analytics:
+        +materialized: table
