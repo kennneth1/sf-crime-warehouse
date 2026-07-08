@@ -327,6 +327,8 @@ Although analytics use incident grain, the raw/report-level data is preserved be
 
 ```bash
 pip install -r requirements.txt
+
+dbt deps  (to install db utils)
 ```
 
 ## Validate dbt connection
@@ -338,7 +340,13 @@ dbt debug
 ## Run transformations
 
 ```bash
-dbt run
+dbt run --select staging
+dbt run --select intermediate       
+dbt run --select path:models/marts/dimensions
+
+or 
+
+dbt build
 ```
 
 ## Run tests
