@@ -190,6 +190,33 @@ dbt test --select stg_crime_incidents
 
 ```
 
+Example fact-dim join usage:
+```
+select
+f.incidentNumber,
+f.incidentCode,
+f.offense_count,
+id.calendar_date as incidentDate,
+rd.calendar_date as reportDate,
+c.severityRank,
+c.offenseCategoryBroad,
+g.district,
+g.intersection,
+g.neighborhood,
+g.latitude,
+g.longitude
+
+
+from fct_incident_offenses f
+join dim_date id on f.incident_date_id = id.date_id
+join dim_date rd on f.report_date_id = rd.date_id
+join dim_offense_category c on f.offense_category_id = c.offense_category_id
+join dim_geo g on f.geo_id = g.geo_id
+
+where id.year>=2026 and g.district = 'Tenderloin' and c.offenseCategoryBroad != 'Other'
+order by f.incidentNumber, f.incidentCode, rd.calendar_date
+```
+
 ---
 
 ## Future Improvements
