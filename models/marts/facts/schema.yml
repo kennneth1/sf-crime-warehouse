@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: fct_incident_offenses
+    columns:
+      - name: incidentNumber
+        tests:
+          - not_null
+      - name: incidentCode
+        tests:
+          - not_null
+      - name: offense_category_id
+        tests:
+          - not_null
+      - name: incident_date_id
+        tests:
+          - not_null
+      - name: incident_time_id
+        tests:
+          - not_null
+      - name: report_date_id
+        tests:
+          - not_null
+      - name: report_time_id
+        tests:
+          - not_null
+      - name: geo_id
+        tests:
+          - not_null
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [incidentNumber, incidentCode]
