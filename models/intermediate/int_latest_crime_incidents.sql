@@ -42,7 +42,8 @@ SELECT
     latitude,
     longitude,
     resolution,
-    intersection
+    intersection,
+    dbt_loaded_at
 
 FROM ranked
 WHERE rn = 1 
