@@ -1,3 +1,9 @@
+{{ config(
+    materialized='incremental',
+    incremental_strategy='merge',
+    unique_key=['incident_number','incident_code']
+) }}
+
 select 
 stg.incident_number,
 stg.incident_code,
