@@ -1,10 +1,3 @@
-/* TODO: Implement once fct tables grow too large
-{{ config(
-    materialized='incremental',
-    unique_key='incident_id'
-) }}
-*/
-
 select 
 stg.incidentNumber,
 stg.incidentCode,
