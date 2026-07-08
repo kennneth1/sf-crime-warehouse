@@ -13,6 +13,7 @@ clean_required as (
       and "Analysis Neighborhood" is not null
       and "Intersection" is not null
       and "Police District" != 'Out of SF'
+      and "Incident Number" != '000000000'
 ),
 
 -- Reformat datetime columns
@@ -67,6 +68,7 @@ category_map as (
 )
       
 select
+    "Incident ID" as incidentId,
     "Incident Number" as incidentNumber,
     "Incident Code" as incidentCode,
     incidentDatetime,

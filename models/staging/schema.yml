@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: stg_crime_incidents
+    columns:
+      - name: incidentId
+        tests:
+          - not_null
+      - name: incidentCode
+        tests:
+          - not_null
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - incidentId
+            - incidentCode
