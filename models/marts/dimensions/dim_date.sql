@@ -26,7 +26,7 @@ final as (
 
         date_trunc(
             'day',
-            date_day + (6 - extract(dow from date_day)) * interval '1 day'
+            date_day + (6 - extract(dow from date_day)) * interval '1 day' date
         ) as week_ending
 
     from date_spine
