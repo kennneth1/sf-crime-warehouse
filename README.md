@@ -117,8 +117,6 @@ models/
 |---|---|
 | `incidentNumber` | Police case / incident identifier (degenerate dimension) |
 | `incidentCode` | Specific offense identifier within an incident (degenerate dimension) |
-| `latitude` | latitude (descriptive attribute) |
-| `longitude` | longitude (descriptive attribute) |
 | `resolution` | Final disposition/outcome of the incident (descriptive attribute e.g., arrest made, citation issued, no action, unresolved) |
 | `offense_category_id` | FK to dim_category |
 | `incident_date_id` | FK to dim_date |
@@ -133,7 +131,7 @@ models/
 |---|---|
 | `dim_date` | Trends, seasonality, day-of-week |
 | `dim_time` | Hours, time-of-day |
-| `dim_geo` | Neighborhood, district, intersection |
+| `dim_geo` | Neighborhood, district, intersection, latitude, longitude |
 | `dim_category` | Standardized category, broad grouping (Violent/Property/etc.), severity rank |
 
 Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT incident_number)` against the fact table.
