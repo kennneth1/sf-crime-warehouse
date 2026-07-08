@@ -10,7 +10,12 @@ stg.incidentNumber,
 stg.incidentCode,
 stg.latitude,
 stg.longitude,
-c.offense_category_id
+c.offense_category_id,
+dd_incident.date_id as incident_date_id,
+dt_incident.time_id as incident_time_id,
+dd_report.date_id as report_date_id,
+dt_report.time_id as report_time_id,
+g.geo_id
 
 from {{ ref('int_latest_crime_incidents') }} stg left join {{ ref('dim_category') }} c --- testing for null dimensions for now
 on stg.incidentCategory = c.offenseCategory 
