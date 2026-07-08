@@ -118,8 +118,9 @@ models/
 | Dimension | Supports |
 |---|---|
 | `dim_date` | Trends, seasonality, day-of-week |
-| `dim_geo` | Neighborhood, district, lat/long |
-| `dim_offense_category` | Standardized category, broad grouping (Violent/Property/etc.), severity rank |
+| `dim_time` | Hours, time-of-day |
+| `dim_geo` | Neighborhood, district, intersection |
+| `dim_category` | Standardized category, broad grouping (Violent/Property/etc.), severity rank |
 
 Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT incident_number)` against the fact table.
 
