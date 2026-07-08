@@ -1,4 +1,5 @@
 import pandas as pd 
+from datetime import datetime
 
 def insert_new_test_row(df):
     insert_row = df.sample(1).copy()
@@ -22,10 +23,8 @@ def update_existing_row(df):
         ]
     )
 
-    # DO NOT change merge keys
-    df.loc[update_idx, "Incident Category"] = "Robbery"
-    df.loc[update_idx, "data_loaded_at"] = "2026-07-08 00:00:00"
-
+    df.loc[update_idx, "data_loaded_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     print("\nAfter update:")
     print(
         df.loc[
@@ -55,7 +54,3 @@ def main():
     )
 
     print("Saved incremental test CSV")
-
-
-if __name__ == "__main__":
-    main()
