@@ -3,9 +3,9 @@ models:
     columns:
       - name: date_id
         tests: [unique, not_null]
-  - name: dim_offense_category
+  - name: dim_offense
     columns:
-      - name: offense_category_id
+      - name: offense_id
         tests: [unique, not_null]
   - name: dim_geo
     columns:

@@ -9,7 +9,7 @@ models:
       - name: incidentCode
         tests:
           - not_null
-      - name: offense_category_id
+      - name: offense_id
         tests:
           - not_null
       - name: incident_date_id
