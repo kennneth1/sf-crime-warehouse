@@ -150,7 +150,7 @@ Plus standard `not_null`/`unique` checks on dimension surrogate keys and `accept
 
 ```bash
 pip install -r requirements.txt
-dbt deps
+dbt deps # for installing db utils
 dbt debug
 dbt build          # run all models + tests
 ```
@@ -161,6 +161,10 @@ dbt build --select staging
 dbt build --select intermediate
 dbt build --select marts.facts
 dbt build --select marts.dimensions
+
+Test:
+dbt test --select stg_crime_incidents
+
 ```
 
 ---
