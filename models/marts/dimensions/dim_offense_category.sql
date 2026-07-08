@@ -1,7 +1,7 @@
 {{ config(materialized='table') }}
 
 with raw as (
-    select distinct incidentCategory
+    select distinct incidentCategory, incidentSubcategory, incidentDescription
     from {{ ref('int_latest_crime_incidents') }}
 ),
 categorized as (
@@ -44,9 +44,11 @@ categorized as (
 )
 
 select   
-{{ dbt_utils.generate_surrogate_key(['incidentCategory']) }} as offense_category_id,
+{{ dbt_utils.generate_surrogate_key(['incidentCode']) }} as offense_category_id,
 incidentCategory as offenseCategory,
 incidentCategoryBroad as offenseCategoryBroad,
+incidentSubcategory as offenseSubCategory,
+incidentDescription as offenseDescription
 severityRank 
 from categorized
 
