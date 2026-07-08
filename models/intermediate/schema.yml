@@ -10,3 +10,4 @@ models:
                 - "Cite or Arrest Adult"
                 - "Exceptional Adult"
                 - "Unfounded"
+                - "MERGE_TEST_UPDATED"
