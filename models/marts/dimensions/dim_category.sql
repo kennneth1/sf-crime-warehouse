@@ -44,9 +44,11 @@ categorized as (
 )
 
 
-select  {{ dbt_utils.generate_surrogate_key(['incidentCategory']) }} as category_id,
-incidentCategory,
-incidentCategoryBroad,
-severityRank from categorized
+select   
+{{ dbt_utils.generate_surrogate_key(['incidentCategory']) }} as offense_category_id,
+incidentCategory as offenseCategory,
+incidentCategoryBroad as offenseCategoryBroad,
+severityRank 
+from categorized
 
 
