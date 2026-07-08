@@ -186,6 +186,7 @@ The staging layer intentionally preserves source information while making it eas
 
 ---
 
+# Intermediate Layer
 Purpose:
 
 Apply business logic that should not exist in staging.
@@ -200,7 +201,31 @@ This layer answers:
 
 > "What is the latest analytical representation of this offense?"
 
+Example ranking / deduplication (keeping rn=1): 
+Incident Code	Report	Resolution	Priority	rn	Why?
+05171	Jan 5	Cite or Arrest Adult	1	1	Latest finalized report
+05171	Jan 3	Open or Active	0	2	Lower priority
+05171	Jan 1	Open or Active	0	3	Older open report
+26080	Jan 4	Open or Active	0	1	No finalized reports, so latest report wins
+26080	Jan 1	Open or Active	0	2	Older report
+27130	Jan 2	Unfounded	1	1	Finalized beats newer Open report
+27130	Jan 6	Open or Active	0	2	Newer, but lower priority
+27130	Jan 1	Open or Active	0	3	Oldest report
 ---
+
+Original rows: 937,866
+Latest offense rows: 883,613
+Rows removed: 54,253
+Reduction: 5.78%
+
+| Statistic                                     |    Value |
+| --------------------------------------------- | -------: |
+| Average reports per incident                  | **1.40** |
+| Average reports per incident-offense          | **1.06** |
+| Maximum reports for a single incident         |  **229** |
+| Maximum reports for a single incident-offense |  **186** |
+
+In short, deduplicated incident-offense records by retaining the latest authoritative report for each offense: removed operational report history, not analytical events.
 
 # Analytics Marts
 
