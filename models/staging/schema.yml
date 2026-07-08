@@ -3,15 +3,15 @@ version: 2
 models:
   - name: stg_crime_incidents
     columns:
-      - name: incidentId
+      - name: incident_id
         tests:
           - not_null
-      - name: incidentCode
+      - name: incident_code
         tests:
           - not_null
 
     tests:
       - dbt_utils.unique_combination_of_columns:
           combination_of_columns:
-            - incidentId
-            - incidentCode
+            - incident_id
+            - incident_code

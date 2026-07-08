@@ -27,7 +27,7 @@ final as (
         date_trunc(
             'day',
             date_day + (6 - extract(dow from date_day)) * interval '1 day'
-        ) as weekEnding
+        ) as week_ending
 
     from date_spine
 ),
@@ -35,7 +35,7 @@ final as (
 final_with_label as (
     select
         *,
-        'Week ending ' || strftime(weekEnding, '%Y-%m-%d') as weekEndingLabel
+        'Week ending ' || strftime(week_ending, '%Y-%m-%d') as week_ending_label
     from final
 )
 
@@ -49,6 +49,6 @@ select
     day_of_week,
     is_weekend,
     quarter,
-    weekEnding,
-    weekEndingLabel
+    week_ending,
+    week_ending_label
 from final_with_label

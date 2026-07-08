@@ -1,23 +1,23 @@
 {{ config(materialized='table') }}
 
 with raw as (
-    select distinct incidentCode, incidentCategory, incidentSubcategory, incidentDescription
+    select distinct incident_code, incident_category, incident_subcategory, incident_description
     from {{ ref('int_latest_crime_incidents') }}
 ),
 categorized as (
     select *,
         case 
-            when incidentCategory in (
+            when incident_category in (
                 'Homicide','Robbery','Assault','Prostitution','Offences Against the Family and Children',
                 'Weapons Carrying','Weapons Offense'
-            ) or incidentCategory like 'Human Trafficking%' then 'Violent'
-            when incidentCategory in ('Arson','Burglary','Motor Vehicle Theft','Larceny Theft','Stolen Property','Malicious Mischief','Vandalism') then 'Property'
-            when incidentCategory in ('Rape','Sex Offense') then 'Sexual'
-            when incidentCategory in ('Fraud','Embezzlement','Forgery and Counterfeiting') then 'Fiscal/Fraud'
-            when incidentCategory = 'Drug Offense' then 'Drug'
+            ) or incident_category like 'Human Trafficking%' then 'Violent'
+            when incident_category in ('Arson','Burglary','Motor Vehicle Theft','Larceny Theft','Stolen Property','Malicious Mischief','Vandalism') then 'Property'
+            when incident_category in ('Rape','Sex Offense') then 'Sexual'
+            when incident_category in ('Fraud','Embezzlement','Forgery and Counterfeiting') then 'Fiscal/Fraud'
+            when incident_category = 'Drug Offense' then 'Drug'
             else 'Other'
-        end as incidentCategoryBroad,
-        case incidentCategory
+        end as incident_category_broad,
+        case incident_category
             when 'Homicide' then 1
             when 'Rape' then 2
             when 'Sex Offense' then 3
@@ -39,18 +39,18 @@ categorized as (
             when 'Drug Offense' then 19
             when 'Weapons Carrying' then 20
             when 'Weapons Offense' then 21
-        end as severityRank
+        end as severity_rank
     from raw
 )
 
 select   
 {{ dbt_utils.generate_surrogate_key(['incidentCode']) }} as offense_id,
-incidentCode,
-incidentCategory as offenseCategory,
-incidentCategoryBroad as offenseCategoryBroad,
-incidentSubcategory as offenseSubCategory,
-incidentDescription as offenseDescription,
-severityRank 
+incident_code,
+incident_category as offense_category,
+incident_category_broad as offense_category_broad,
+incident_subcategory as offense_subcategory,
+incident_description as offense_description,
+severity_rank 
 from categorized
 
 
