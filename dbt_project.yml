@@ -14,7 +14,7 @@ clean-targets:
   - "dbt_packages"
 
 models:
-  sf-crime-warehouse:
+  sf_crime_warehouse:
     staging:
       +materialized: view
     intermediate:
