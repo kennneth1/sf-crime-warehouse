@@ -126,6 +126,7 @@ models/
 | `report_date_id` | FK to dim_date |
 | `report_time_id` | FK to dim_time |
 | `geo_id` | FK to dim_geo |
+| `offense_count` | measure |
 
 **`fct_incident_offenses`** — grain: 1 row = 1 Incident Number + 1 Incident Code. Contains offense/geo/category keys, resolution, lat/long as descriptive attributes (low-cardinality, no reuse case — kept in-fact rather than dimensionalized).
 
