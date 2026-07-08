@@ -55,6 +55,8 @@ A single case can span multiple reports filed over time (initial + supplements),
 
 This grain choice means one incident (e.g. a burglary arrest involving conspiracy and possession charges) correctly produces multiple fact rows — one per offense — rather than arbitrarily collapsing to a single category.
 
+Incident Code was confirmed to map near-1:1 to Incident Description, reinforcing that the offense code — not the incident number — is the dataset's true atomic classification key.
+
 ---
 
 ## Deduplication Logic
