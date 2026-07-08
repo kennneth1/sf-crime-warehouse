@@ -1,383 +1,173 @@
 # SF Crime Data Warehouse
 
-An end-to-end data engineering and analytics warehouse project built using **dbt + DuckDB** to transform raw San Francisco crime data into analytics-ready dimensional models.
+An end-to-end analytics engineering project built with **dbt + DuckDB**, transforming raw San Francisco crime data into an analytics-ready dimensional model.
 
-The project demonstrates modern analytics engineering practices including:
-
-* Data ingestion and staging
-* Data cleaning and standardization
-* Dimensional modeling
-* Fact/dimension design
-* Data quality testing
-* Reproducible transformations using dbt
+Demonstrates: source profiling, dimensional modeling, grain resolution, and dbt-enforced data quality testing.
 
 ---
 
-# Project Overview
+## Project Overview
 
-The goal of this project is to transform raw crime records into a clean analytical warehouse that enables users to answer questions such as:
+Transforms raw SFPD incident records into a clean warehouse that answers:
 
-* How has crime changed over time?
-* Which neighborhoods experience the most incidents?
-* What categories of crime are most common?
-* How do crime patterns differ by police district?
-* What percentage of incidents are resolved?
+- How has crime changed over time?
+- Which neighborhoods/districts see the most incidents?
+- What crime categories are most common?
+- What percentage of offenses are resolved?
 
-The final warehouse models crime data at the **incident-offense grain**, where each row represents the latest authoritative state of one offense associated with a police incident.
+**Fact grain:** one row = one offense (`Incident Number + Incident Code`), reflecting its latest authoritative state.
+
 ---
 
-# Architecture
+## Architecture
 
 ```
-Raw Crime Dataset
-        |
-        v
-Landing Layer
-        |
-        v
-Staging Models (dbt)
-        |
-        v
-Analytics Marts
-        |
-        v
-BI / Analytics
+Raw Crime CSV → Landing → Staging (dbt) → Intermediate (dedup) → Marts → BI
 ```
 
-## Technology Stack
-
-| Tool     | Purpose                             |
-| -------- | ----------------------------------- |
-| DuckDB   | Local analytical database           |
-| dbt      | SQL transformations and modeling    |
-| Python   | Data preparation/scripts            |
-| DataGrip (recommended) | Database exploration and validation |
+| Tool | Purpose |
+|---|---|
+| DuckDB | Local analytical database |
+| dbt | Transformations, testing, docs |
+| Python/pandas | Source profiling |
 
 ---
 
-# Data Modeling Approach
+## Key Finding: Source Grain vs. Analytical Grain
 
-## Fact Table Grain
+Initial design assumed `Incident Number` was the atomic crime entity. Profiling revealed a three-level hierarchy, later confirmed by [SFPD's official data dictionary](https://sfdigitalservices.gitbook.io/dataset-explainers/sfpd-incident-report-2018-to-present):
 
-The primary analytical fact table is modeled at the incident-offense grain:
-
-> One row = one Incident Number + one Incident Code
-
-During data profiling, it was discovered that a single Incident Number may contain multiple offense classifications (Incident Codes). Each offense can also have multiple report records over its lifecycle as officers submit initial reports, supplements, and resolution updates.
-
-For example:
-
-```text
-Incident Number: 260065646
-
-Burglary
-Conspiracy
-Burglary Tools
+```
+Incident Number (the case / "Case Number")
+    └── Incident ID (a report: Initial, Vehicle Supplement, or Coplogic Supplement)
+            └── Incident Code (an offense recorded on that report)
 ```
 
-These represent separate offenses associated with the same police incident rather than duplicate records.
+A single case can span multiple reports filed over time (initial + supplements), and each report can carry one or more offense codes. `Incident ID + Incident Code` is the source system's own documented unique row — verified in this warehouse via a `dbt_utils.unique_combination_of_columns` test on staging (passing across all 937k rows).
 
-The warehouse therefore preserves offense-level detail while removing duplicate report updates, allowing downstream users to analyze both offense-level metrics and incident-level metrics without losing information.
+> **Profiling and source documentation confirmed that `Incident Number` represents a case that can span multiple reports and offenses. The warehouse models the fact table at the `Incident Number + Incident Code` grain to preserve offense-level detail, with uniqueness verified by dbt tests at both the staging (`incidentId + incidentCode`) and intermediate (`incidentNumber + incidentCode`) layers.**
+
+This grain choice means one incident (e.g. a burglary arrest involving conspiracy and possession charges) correctly produces multiple fact rows — one per offense — rather than arbitrarily collapsing to a single category.
 
 ---
 
-# Source Data Grain vs Analytical Grain
+## Deduplication Logic
 
-The source crime dataset contains three conceptual levels of information:
+Each offense (`Incident Number + Incident Code`) may have multiple report updates over its lifecycle. The intermediate layer collapses these to one authoritative row:
 
-1. Police incident (Incident Number)
-2. Offense classifications within that incident (Incident Code)
-3. Multiple report records describing updates to each offense over time
+1. Prefer a finalized resolution (`Cite or Arrest Adult`, `Exceptional Adult`, `Unfounded`) over `Open or Active`.
+2. Among candidates, take the latest `Report Datetime`.
+3. On a true timestamp tie (common when two separate reports — e.g. an Initial and a Supplement — land at the same rounded timestamp), break with `Incident ID` descending, since it's the system-assigned, monotonically increasing report identifier.
 
-For example:
-
-```text
-Incident Number
-    |
-    +-- Burglary
-    |     |
-    |     +-- Initial Report
-    |     +-- Supplemental Report
-    |
-    +-- Conspiracy
-    |     |
-    |     +-- Initial Report
-    |     +-- Supplemental Report
-    |
-    +-- Burglary Tools
-          |
-          +-- Initial Report
-          +-- Supplemental Report
+```sql
+row_number() over (
+    partition by incidentNumber, incidentCode
+    order by
+        case when resolution in ('Cite or Arrest Adult','Exceptional Adult','Unfounded')
+             then 1 else 0 end desc,
+        reportDatetime desc,
+        incidentId desc
+) as rn
 ```
 
-Although these records belong to the same police incident, they represent distinct offenses whose report histories evolve independently.
+**Impact:**
 
-### Choosing the Analytical Grain
+| Statistic | Value |
+|---|---:|
+| Raw report rows | 937,866 |
+| Canonical offense rows | 883,613 |
+| Rows collapsed | 54,253 (5.78%) |
+| Avg. reports per incident | 1.40 |
+| Avg. reports per incident-offense | 1.06 |
 
-Rather than collapsing all offenses into a single incident record, the warehouse preserves the finest meaningful analytical grain:
-
-> One row = one Incident Number + one Incident Code
-
-This allows the warehouse to retain every offense classification while eliminating duplicate report updates generated throughout an investigation.
-
-### Resolving Multiple Reports
-
-Because each offense may have multiple reports over time, the intermediate layer selects a single authoritative record for every Incident Number + Incident Code combination.
-
-The selection logic is:
-
-1. Prefer finalized resolutions (Cite or Arrest Adult, Exceptional Adult, Unfounded).
-2. If multiple finalized reports exist, select the most recent report.
-3. If no finalized report exists, select the latest available report.
-
-This produces one canonical analytical record for each offense while preserving the complete set of offenses associated with every incident.
+The low collapse rate confirms most removed rows are report-lifecycle noise (supplements/updates), not distinct analytical events — the grain choice loses minimal information while eliminating duplication.
 
 ---
 
-# dbt Model Structure
+## dbt Model Structure
 
 ```
 models/
-
 ├── staging/
-│   └── stg_crime_incidents.sql
-
+│   └── stg_crime_incidents.sql        (native grain: incidentId + incidentCode)
 ├── intermediate/
-│   └── int_latest_crime_incidents.sql
-
+│   └── int_latest_crime_incidents.sql (dedup → incidentNumber + incidentCode)
 └── marts/
-    ├── fact_crime_incidents.sql
-    ├── dim_date.sql
-    ├── dim_geo.sql
-    └── dim_incident_category.sql
+    ├── facts/
+    │   └── fct_incident_offenses.sql
+    └── dimensions/
+        ├── dim_date.sql
+        ├── dim_geo.sql
+        └── dim_offense_category.sql
 ```
+
+**Staging** preserves source fidelity (clean types, standardize category strings, filter invalid/placeholder incident numbers like `000000000`). **Intermediate** applies the dedup business rule above. **Marts** expose analyst-friendly naming — e.g. `offenseCategory` instead of the source's `Incident Category`, since the fact table's grain is the offense, not the whole case.
 
 ---
 
-# Staging Layer
+## Fact & Dimensions
 
-Purpose:
+**`fct_incident_offenses`** — grain: 1 row = 1 Incident Number + 1 Incident Code. Contains offense/geo/category keys, resolution, lat/long as descriptive attributes (low-cardinality, no reuse case — kept in-fact rather than dimensionalized).
 
-* Remove invalid records
-* Clean raw fields
-* Standardize naming conventions
-* Cast data types
-* Normalize categories
+| Dimension | Supports |
+|---|---|
+| `dim_date` | Trends, seasonality, day-of-week |
+| `dim_geo` | Neighborhood, district, lat/long |
+| `dim_offense_category` | Standardized category, broad grouping (Violent/Property/etc.), severity rank |
 
-Examples:
-
-Raw:
-
-```
-Incident Category
-Analysis Neighborhood
-Police District
-```
-
-becomes:
-
-```
-incidentCategory
-neighborhood
-district
-```
-
-The staging layer intentionally preserves source information while making it easier to consume.
+Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT incident_number)` against the fact table.
 
 ---
 
-# Intermediate Layer
-Purpose:
-
-Apply business logic that should not exist in staging.
-
-Example:
-* Resolve multiple report records for each offense
-* Deduplicate report history
-* Select the latest authoritative state for every Incident Number + Incident Code
-
-This layer answers:
-
-> "What is the latest analytical representation of this offense?"
-
-Example ranking / deduplication (keeping rn=1): 
-Incident Code	Report	Resolution	Priority	rn	Why?
-05171	Jan 5	Cite or Arrest Adult	1	1	Latest finalized report
-05171	Jan 3	Open or Active	0	2	Lower priority
-05171	Jan 1	Open or Active	0	3	Older open report
-26080	Jan 4	Open or Active	0	1	No finalized reports, so latest report wins
-26080	Jan 1	Open or Active	0	2	Older report
-27130	Jan 2	Unfounded	1	1	Finalized beats newer Open report
-27130	Jan 6	Open or Active	0	2	Newer, but lower priority
-27130	Jan 1	Open or Active	0	3	Oldest report
----
-
-Original rows: 937,866
-Latest offense rows: 883,613
-Rows removed: 54,253
-Reduction: 5.78%
-
-| Statistic                                     |    Value |
-| --------------------------------------------- | -------: |
-| Average reports per incident                  | **1.40** |
-| Average reports per incident-offense          | **1.06** |
-| Maximum reports for a single incident         |  **229** |
-| Maximum reports for a single incident-offense |  **186** |
-
-In short, deduplicated incident-offense records by retaining the latest authoritative report for each offense: removed operational report history, not analytical events.
-
-# Analytics Marts
-
-The final models are designed for BI and analysis.
-
-## Fact: Incident Offenses
-Grain:
-
-```
-1 row = 1 Incident Number + 1 Incident Code
-```
-
-Contains:
-
-* Incident identifiers
-* Dates
-* Category keys
-* Geography keys
-* Resolution status
-
----
-
-## Dimensions
-
-### Date Dimension
-
-Supports:
-
-* Year analysis
-* Monthly trends
-* Day-of-week analysis
-
----
-
-### Geography Dimension
-
-Supports:
-
-* Neighborhood analysis
-* Police district analysis
-* Location-based reporting
-
----
-
-### Crime Category Dimension
-
-Provides standardized crime classifications.
-
-The source dataset refers to this attribute as `Incident Category`. However, because the warehouse fact table is modeled at the offense grain (`incident_number + incident_code`), this attribute represents the classification of an individual offense rather than the entire police incident.
-
-Therefore, the analytical layer exposes this field as `offenseCategory` to better reflect its meaning.
-
----
-
-# Data Quality Considerations
-
-dbt tests validate:
-
-* Unique incident identifiers
-* Required fields
-* Referential integrity
-* Valid categories
-* Non-null critical attributes
-
-Example:
+## Data Quality Tests
 
 ```yaml
-tests:
-  - unique
-  - not_null
+- name: stg_crime_incidents
+  tests:
+    - dbt_utils.unique_combination_of_columns:
+        arguments:
+          combination_of_columns: [incidentId, incidentCode]
+
+- name: int_latest_crime_incidents
+  tests:
+    - dbt_utils.unique_combination_of_columns:
+        arguments:
+          combination_of_columns: [incidentNumber, incidentCode]
 ```
 
----
-
-# Key Design Decisions
-
-## Why Incident-Offense Grain Instead of Report Grain?
-The source dataset is captured at the report level, where multiple records may describe the same offense as an investigation progresses.
-
-Modeling directly at report grain would require every downstream user to understand police reporting workflows and avoid counting supplemental reports as separate analytical events.
-
-Instead, the warehouse resolves report history into one authoritative record per Incident Number + Incident Code.
-
-This preserves every offense while removing operational noise introduced by repeated report updates.
-
-Incident-level analysis remains available through aggregation using Incident Number.
+Plus standard `not_null`/`unique` checks on dimension surrogate keys and `accepted_values` on `resolution`.
 
 ---
 
-## Why Keep Raw Report Information?
-
-Although analytics use incident grain, the raw/report-level data is preserved because it may support future analysis:
-
-* Time to resolution
-* Number of updates per incident
-* Data correction history
-* Reporting workflow analysis
-
----
-
-# Running Locally
-
-## Install dependencies
+## Running Locally
 
 ```bash
 pip install -r requirements.txt
-
-dbt deps  (to install db utils)
-```
-
-## Validate dbt connection
-
-```bash
+dbt deps
 dbt debug
+dbt build          # run all models + tests
 ```
 
-## Run transformations
-
+Run a specific layer:
 ```bash
-dbt run --select staging
-dbt run --select intermediate       
-dbt run --select path:models/marts/dimensions
-
-or 
-
-dbt build
-```
-
-## Run tests
-
-```bash
-dbt test
+dbt build --select staging
+dbt build --select intermediate
+dbt build --select marts.facts
+dbt build --select marts.dimensions
 ```
 
 ---
 
-# Future Improvements
+## Future Improvements
 
-Potential extensions:
-
-* Add incremental models for new crime ingestion
-* Add Airflow orchestration
-* Deploy warehouse to cloud storage/warehouse
-* Add BI dashboard layer
-* Track incident history using snapshots
+- Incremental models for new incident ingestion
+- Airflow orchestration
+- Cloud warehouse deployment
+- BI dashboard layer
+- Snapshots to track offense resolution history over time
 
 ---
 
-# Lessons Learned
+## Lessons Learned
 
-This project demonstrates that analytics engineering is not only about writing SQL transformations. The most important decisions involve:
-
-* Choosing the correct business grain
-* Separating source data from analytical models
-* Moving business logic upstream
-* Designing tables around user questions rather than source-system structure
+The core challenge wasn't SQL — it was determining the correct business grain. `Incident Number` looked like the natural entity, but source profiling and SFPD's own documentation revealed a case → report → offense hierarchy that would have silently dropped offense-level detail if modeled naively. The final design preserves that detail while still supporting incident-level rollups, backed by dbt tests that make the grain claim verifiable rather than assumed.
