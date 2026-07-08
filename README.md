@@ -145,8 +145,20 @@ As of run on Jul 8 2026 (using 3+ month old CSV), fact has 883,613 rows spanning
 Incident-level metrics (e.g. "how many police cases occurred?") remain available via `COUNT(DISTINCT incident_number)` against the fact table.
 
 
-
 ---
+## Incremental Fact Loading
+
+`fct_incident_offenses` is implemented as a dbt incremental model using a merge strategy.
+
+The fact table uses incident_number and incident_code as its natural unique key:
+
+```sql
+{{ config(
+    materialized='incremental',
+    incremental_strategy='merge',
+    unique_key=['incidentNumber', 'incidentCode']
+) }}
+
 
 ## Data Quality Tests
 
