@@ -82,6 +82,6 @@ select
     Longitude as longitude,
     Resolution as resolution,
     "Intersection" as intersection,
-    current_timestamp as dbt_loaded_at
+    current_timestamp as _loaded_at
 
 from category_map
