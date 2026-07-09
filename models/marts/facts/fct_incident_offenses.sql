@@ -19,10 +19,10 @@ base._loaded_at,
 
 from {{ ref('int_latest_crime_incidents') }} base left join {{ ref('dim_offense') }} c --- testing for null dimensions for now
 on base.incident_code = c.incident_code 
-left join {{ ref('dim_date') }} dd_incident on dd_incident.date_id = cast(strftime(date_trunc('day', stg.incident_datetime), '%Y%m%d') as int)
-left join {{ ref('dim_time') }} dt_incident on dt_incident.time_id = cast(extract(hour from stg.incident_datetime) as int)
-left join {{ ref('dim_date') }} dd_report on dd_report.date_id = cast(strftime(date_trunc('day', stg.report_datetime), '%Y%m%d') as int)
-left join {{ ref('dim_time') }} dt_report on dt_report.time_id = cast(extract(hour from stg.report_datetime) as int)
+left join {{ ref('dim_date') }} dd_incident on dd_incident.date_id = cast(strftime(date_trunc('day', base.incident_datetime), '%Y%m%d') as int)
+left join {{ ref('dim_time') }} dt_incident on dt_incident.time_id = cast(extract(hour from base.incident_datetime) as int)
+left join {{ ref('dim_date') }} dd_report on dd_report.date_id = cast(strftime(date_trunc('day', base.report_datetime), '%Y%m%d') as int)
+left join {{ ref('dim_time') }} dt_report on dt_report.time_id = cast(extract(hour from base.report_datetime) as int)
 left join {{ ref('dim_geo')}} g
     on base.latitude = g.latitude and base.longitude = g.longitude
     and base.intersection = g.intersection
