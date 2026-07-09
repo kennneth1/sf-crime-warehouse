@@ -130,6 +130,7 @@ models/
 | `report_date_id` | FK to dim_date |
 | `report_time_id` | FK to dim_time |
 | `geo_id` | FK to dim_geo |
+| `_loaded_at` | dbt datetime created in staging |
 | `offense_count` | measure |
 
 As of run on Jul 8 2026 (using 3+ month old CSV), fact has 883,613 rows spanning incident dates 2018-01-01 to 2026-2-04.
@@ -208,31 +209,37 @@ dbt test --select stg_crime_incidents
 Use duckdb_jdbc-1.3.0.0.jar to connect in tablaeu
 ```
 
-Example fact-dim join usage:
+mart_sf_2022_2026.sql fact-dim example:
 ```
 select
-f.incidentNumber,
-f.incidentCode,
+f.incident_number,
+f.incident_code,
 f.offense_count,
-id.calendar_date as incidentDate,
-rd.calendar_date as reportDate,
-c.severityRank,
-c.offenseBroad,
+id.calendar_date as incident_date,
+id.week_ending,
+id.week_ending_label,
+it.time_of_day_bucket,
+rd.calendar_date as report_date,
+c.severity_rank,
+c.offense_category_broad,
 g.district,
 g.intersection,
 g.neighborhood,
 g.latitude,
-g.longitude
+g.longitude,
+r.resolution
 
 
 from fct_incident_offenses f
-join dim_date id on f.incident_date_id = id.date_id
-join dim_date rd on f.report_date_id = rd.date_id
-join dim_offense c on f.offense_id = c.offense_id
-join dim_geo g on f.geo_id = g.geo_id
+join {{ ref('dim_date') }} id on f.incident_date_id = id.date_id
+join {{ ref('dim_date') }} rd on f.report_date_id = rd.date_id
+join {{ ref('dim_time') }} it on f.incident_time_id = it.time_id
+join {{ ref('dim_offense') }} c on f.offense_id = c.offense_id
+join {{ ref('dim_geo') }} g on f.geo_id = g.geo_id
+join {{ ref('dim_resolution') }} r on f.resolution_id = r.resolution_id
 
-where id.year>=2026 and g.district = 'Tenderloin' and c.offenseBroad != 'Other'
-order by f.incidentNumber, f.incidentCode, rd.calendar_date
+where id.year>=2022 and c.offense_category_broad != 'Other'
+order by f.incident_number, f.incident_code, rd.calendar_date
 ```
 
 ---

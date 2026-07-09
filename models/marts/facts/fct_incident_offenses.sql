@@ -28,4 +28,4 @@ left join {{ ref('dim_geo')}} g
     and base.intersection = g.intersection
     and base.district = g.district
     and base.neighborhood = g.neighborhood
-left join {{ ref('dim_resolution') }} r on stbaseg.resolution = r.resolution
+left join {{ ref('dim_resolution') }} r on base.resolution = r.resolution
