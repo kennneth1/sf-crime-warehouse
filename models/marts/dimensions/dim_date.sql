@@ -27,7 +27,7 @@ final as (
         date_trunc(
             'day',
             date_day + (6 - extract(dow from date_day)) * interval '1 day' 
-        ) as week_ending
+        )::date as week_ending
 
     from date_spine
 ),
