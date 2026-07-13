@@ -254,4 +254,4 @@ order by f.incident_number, f.incident_code, rd.calendar_date
 
 ## Lessons Learned
 
-The core challenge wasn't SQL — it was determining the correct business grain. `Incident Number` looked like the natural entity, but source profiling and SFPD's own documentation revealed a case → report → offense hierarchy that would have silently dropped offense-level detail if modeled naively. The final design preserves that detail while still supporting incident-level rollups, backed by dbt tests that make the grain claim verifiable rather than assumed.
+The core challenge was determining the correct business grain. `Incident Number` looked like the natural entity, but source profiling and SFPD's own documentation revealed a case → report → offense hierarchy. The final design preserves that detail while still supporting incident-level rollups, backed by dbt tests that make the grain claim verifiable rather than assumed.
