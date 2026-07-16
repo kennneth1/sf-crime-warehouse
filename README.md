@@ -15,7 +15,7 @@ Transforms raw SFPD incident records (https://data.sfgov.org/Public-Safety/Polic
 - What crime categories are most common?
 - What percentage of offenses are resolved?
 
-![Dashboard](images/dashboard.png)
+![Dashboard](images/diagram.png)
 
 **Fact grain:** one row = one offense (`Incident Number + Incident Code`), reflecting its latest authoritative state.
 
