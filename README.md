@@ -190,6 +190,7 @@ Plus standard `not_null`/`unique` checks on dimension surrogate keys and `accept
 ---
 
 ## Running Locally
+Download the sf crime incidents csv (https://data.sfgov.org/Public-Safety/Police-Department-Incident-Reports-2018-to-Present/wg3w-h783/about_data), name it 'sf_crime.csv' and place into the root of this directory. 
 
 ```bash
 pip install -r requirements.txt
