@@ -51,13 +51,13 @@ Incident Number (the case / "Case Number")
             └── Incident Code (an offense recorded on that report)
 ```
 
-A single case can span multiple reports filed over time (initial + supplements), and each report can carry one or more offense codes. `Incident ID + Incident Code` is the source system's own documented unique row - verified in this warehouse via a `dbt_utils.unique_combination_of_columns` test on staging (passing across all 937k rows).
+A single case can span multiple reports filed over time (initial + supplements), and each report can carry one or more offense codes. `Incident ID + Incident Code` is the source system's own documented unique row; verified in this warehouse via a `dbt_utils.unique_combination_of_columns` test on staging (passing across all 937k rows).
 
 > **Profiling and source documentation confirmed that `Incident Number` represents a case that can span multiple reports and offenses. The warehouse models the fact table at the `Incident Number + Incident Code` grain to preserve offense-level detail, with uniqueness verified by dbt tests at both the staging (`incidentId + incidentCode`) and intermediate (`incidentNumber + incidentCode`) layers.**
 
-This grain choice means one incident (e.g. a burglary arrest involving conspiracy and possession charges) correctly produces multiple fact rows — one per offense — rather than arbitrarily collapsing to a single category.
+This grain choice means one incident (e.g. a burglary arrest involving conspiracy and possession charges) correctly produces multiple fact rows, one per offense, rather than arbitrarily collapsing to a single category.
 
-Incident Code was confirmed to map near-1:1 to Incident Description, reinforcing that the offense code — not the incident number — is the dataset's true atomic classification key.
+Incident Code was confirmed to map near-1:1 to Incident Description.
 
 ---
 
@@ -90,7 +90,7 @@ row_number() over (
 | Avg. reports per incident | 1.40 |
 | Avg. reports per incident-offense | 1.06 |
 
-The low collapse rate confirms most removed rows are report-lifecycle noise (supplements/updates), not distinct analytical events — the grain choice loses minimal information while eliminating duplication.
+The low collapse rate confirms most removed rows are report-lifecycle noise (supplements/updates), not distinct analytical events; the grain choice loses minimal information while eliminating duplication.
 
 ---
 
