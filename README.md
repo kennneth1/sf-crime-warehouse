@@ -49,7 +49,7 @@ Incident Number (the case / "Case Number")
             └── Incident Code (an offense recorded on that report)
 ```
 
-A single case can span multiple reports filed over time (initial + supplements), and each report can carry one or more offense codes. `Incident ID + Incident Code` is the source system's own documented unique row — verified in this warehouse via a `dbt_utils.unique_combination_of_columns` test on staging (passing across all 937k rows).
+A single case can span multiple reports filed over time (initial + supplements), and each report can carry one or more offense codes. `Incident ID + Incident Code` is the source system's own documented unique row - verified in this warehouse via a `dbt_utils.unique_combination_of_columns` test on staging (passing across all 937k rows).
 
 > **Profiling and source documentation confirmed that `Incident Number` represents a case that can span multiple reports and offenses. The warehouse models the fact table at the `Incident Number + Incident Code` grain to preserve offense-level detail, with uniqueness verified by dbt tests at both the staging (`incidentId + incidentCode`) and intermediate (`incidentNumber + incidentCode`) layers.**
 
@@ -65,7 +65,7 @@ Each offense (`Incident Number + Incident Code`) may have multiple report update
 
 1. Prefer a finalized resolution (`Cite or Arrest Adult`, `Exceptional Adult`, `Unfounded`) over `Open or Active`.
 2. Among candidates, take the latest `Report Datetime`.
-3. On a true timestamp tie (common when two separate reports — e.g. an Initial and a Supplement — land at the same rounded timestamp), break with `Incident ID` descending, since it's the system-assigned, monotonically increasing report identifier.
+3. On a true timestamp tie (common when two separate reports, e.g. an Initial and a Supplement, land at the same rounded timestamp), break with `Incident ID` descending, since it's the system-assigned, monotonically increasing report identifier.
 
 ```sql
 row_number() over (
