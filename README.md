@@ -2,7 +2,7 @@
 
 An end-to-end analytics engineering project built with **dbt + DuckDB**, transforming raw San Francisco crime data into an analytics-ready dimensional model.
 
-![Dashboard](images/viz.png)
+![Viz](images/viz.png)
 
 Added proportional markers for incident volume and color-coding each intersection by its dominant crime category. Users can filter by week, quarter, or custom date range to explore how crime patterns vary geographically and evolve over time.
 
