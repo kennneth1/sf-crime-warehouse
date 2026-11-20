@@ -1,6 +1,6 @@
 # SF Crime Data Warehouse
 
-An end-to-end analytics engineering project built with **dbt + DuckDB**, transforming raw San Francisco crime data into an analytics-ready dimensional model.
+An end-to-end analytics engineering project built with **dbt + DuckDB**, transforming raw San Francisco crime data into an analytics-ready dimensional model for interactive analysis and visualization in Tableau.
 
 ![Viz](images/viz.png)
 
