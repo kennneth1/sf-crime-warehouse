@@ -1,10 +1,10 @@
 # SF Crime Data Warehouse
 
-An end-to-end analytics engineering project built with **dbt + DuckDB**, transforming raw San Francisco crime data into an analytics-ready dimensional model for interactive analysis and visualization in Tableau.
+An end-to-end analytics engineering project built with **dbt + DuckDB**, transforming raw San Francisco crime data into an analytics-ready dimensional model for interactive analysis and visualization in Tableau:
 
-![Viz](images/viz2.png)
+![Viz](images/viz3.png)
 
-*Tableau Dashboard - Incident counts for size and color-coded each intersection by its dominant crime category. Users can filter by weeks, quarter, and total incidents to explore how crime patterns vary geographically and evolve over time.*
+*Users can filter by weeks, quarter, and total incidents to explore how crime patterns vary geographically and evolve over time.*
 
 ---
 
@@ -25,7 +25,6 @@ Incident Number = the overall case.
 Incident ID = a write-up/report filed for that case, containing a batch of offense codes.
 Incident Code = one offense within that batch.
 
-**dbt implementation:** staging's native grain is `incident_id + incident_code` (one row per offense-per-report, per SFPD docs); intermediate collapses that to `incident_number + incident_code` via `ROW_NUMBER()` (resolution priority → latest report_datetime → `incident_id` as final tiebreak); marts/fact select only `incident_number + incident_code` — `incident_id` did its job upstream and never surfaces downstream.
 
 ---
 
