@@ -4,7 +4,7 @@ An end-to-end analytics engineering project built with **dbt + DuckDB**, transfo
 
 ![Viz](images/viz4.png)
 
-*Users can filter by weeks, quarter, and total incidents to explore how crime patterns vary geographically and evolve over time.*
+*Users can filter by time range, categories, and total incidents to explore how crime patterns vary geographically and evolve over time.*
 
 ---
 
