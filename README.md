@@ -4,7 +4,7 @@ An end-to-end analytics engineering project built with **dbt + DuckDB**, transfo
 
 ![Viz](images/viz2.png)
 
-Added proportional markers for incident volume and color-coding each intersection by its dominant crime category. Users can filter by week, quarter, or custom date range to explore how crime patterns vary geographically and evolve over time.
+*Tableau Dashboard - Incident counts for size and color-coded each intersection by its dominant crime category. Users can filter by weeks, quarter, and total incidents to explore how crime patterns vary geographically and evolve over time.*
 
 ---
 
@@ -43,25 +43,6 @@ Raw Crime CSV → Landing → Staging (dbt) → Intermediate (dedup) → Marts �
 
 ---
 
-## Key Finding: Source Grain vs. Analytical Grain
-
-Initial design assumed `Incident Number` was the atomic crime entity. Profiling revealed a three-level hierarchy, later confirmed by [SFPD's official data dictionary](https://sfdigitalservices.gitbook.io/dataset-explainers/sfpd-incident-report-2018-to-present):
-
-```
-Incident Number (the case / "Case Number")
-    └── Incident ID (a report: Initial, Vehicle Supplement, or Coplogic Supplement)
-            └── Incident Code (an offense recorded on that report)
-```
-
-A single case can span multiple reports filed over time (initial + supplements), and each report can carry one or more offense codes. `Incident ID + Incident Code` is the source system's own documented unique row; verified in this warehouse via a `dbt_utils.unique_combination_of_columns` test on staging (passing across all 937k rows).
-
-> **Profiling and source documentation confirmed that `Incident Number` represents a case that can span multiple reports and offenses. The warehouse models the fact table at the `Incident Number + Incident Code` grain to preserve offense-level detail, with uniqueness verified by dbt tests at both the staging (`incidentId + incidentCode`) and intermediate (`incidentNumber + incidentCode`) layers.**
-
-This grain choice means one incident (e.g. a burglary arrest involving conspiracy and possession charges) correctly produces multiple fact rows, one per offense, rather than arbitrarily collapsing to a single category.
-
-Incident Code was confirmed to map near-1:1 to Incident Description.
-
----
 
 ## Deduplication Logic
 
