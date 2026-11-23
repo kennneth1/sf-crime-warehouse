@@ -203,6 +203,3 @@ Use duckdb_jdbc-1.3.0.0.jar to connect in tablaeu
 
 ---
 
-## Lessons Learned
-
-The core challenge was determining the correct business grain. `Incident Number` looked like the natural entity, but source profiling and SFPD's own documentation revealed a case → report → offense hierarchy. The final design preserves that detail while still supporting incident-level rollups, backed by dbt tests that make the grain claim verifiable rather than assumed.
