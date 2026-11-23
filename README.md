@@ -2,7 +2,7 @@
 
 An end-to-end analytics engineering project built with **dbt + DuckDB**, transforming raw San Francisco crime data into an analytics-ready dimensional model for interactive analysis and visualization in Tableau:
 
-![Viz](images/viz3.png)
+![Viz](images/viz4.png)
 
 *Users can filter by weeks, quarter, and total incidents to explore how crime patterns vary geographically and evolve over time.*
 
